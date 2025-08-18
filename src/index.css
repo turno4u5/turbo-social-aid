@@ -1,10 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Turno Social Media Growth Platform Design System */
 
 @layer base {
   :root {
@@ -39,19 +38,12 @@ All colors MUST be HSL.
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -92,6 +84,106 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    min-height: 100vh;
+    @apply text-white;
+  }
+}
+
+/* Turno Specific Styles */
+.floating-icon {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neon-glow {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2), 0 0 60px rgba(0, 255, 255, 0.1);
+}
+
+.platform-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+}
+
+.platform-card.selected {
+    border-color: #00d4ff;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+}
+
+.mission-button {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    transition: all 0.3s ease;
+    border: none;
+    color: white;
+}
+
+.mission-button:hover {
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+.mission-button.completed {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.action-button {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.action-button:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.action-button.completed {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.5);
+    color: #10b981;
+}
+
+.liquid-send-button {
+    background: linear-gradient(45deg, #00ffff, #0080ff, #00ffff);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4);
+    animation: liquidGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes liquidGlow {
+    0% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.6), 0 0 80px rgba(0, 128, 255, 0.4); }
+    100% { box-shadow: 0 0 60px rgba(0, 255, 255, 0.8), 0 0 100px rgba(0, 128, 255, 0.6); }
+}
+
+.progress-bar {
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    height: 100%;
+    transition: width 0.5s ease;
 }
 
 @layer base {
