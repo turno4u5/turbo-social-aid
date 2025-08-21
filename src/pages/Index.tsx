@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Mission {
   selected: boolean;
@@ -278,48 +277,24 @@ const Index = () => {
     countdownIntervalRef.current = setInterval(updateCountdown, 1000);
   };
 
-  const sendMissions = async () => {
-    try {
-      const usernameLower = username.trim().toLowerCase();
-      const now = Date.now();
-      const usedCombinations = getUsedCombinations();
-      
-      // Save to Supabase database
-      const { error } = await supabase
-        .from('user_submissions')
-        .insert({
-          platform: selectedPlatform,
-          username: usernameLower,
-          video_link: videoLink || null,
-          follow_account: platformLinks[selectedPlatform as keyof typeof platformLinks],
-          follow_completed: followCompleted,
-          missions_data: missions as any,
-          ip_address: null, // Will be filled by backend if needed
-          user_agent: navigator.userAgent
-        });
-
-      if (error) {
-        console.error('Error saving submission:', error);
-        return;
+  const sendMissions = () => {
+    const usernameLower = username.trim().toLowerCase();
+    const now = Date.now();
+    const usedCombinations = getUsedCombinations();
+    
+    Object.keys(missions).forEach(type => {
+      if (missions[type as keyof Missions].selected && type === 'followers') {
+        const combinationKey = `${selectedPlatform}_${usernameLower}_${type}_${missions[type as keyof Missions].count}`;
+        usedCombinations[combinationKey] = {
+          timestamp: now,
+          used: true
+        };
       }
-      
-      // Update localStorage for follower tracking
-      Object.keys(missions).forEach(type => {
-        if (missions[type as keyof Missions].selected && type === 'followers') {
-          const combinationKey = `${selectedPlatform}_${usernameLower}_${type}_${missions[type as keyof Missions].count}`;
-          usedCombinations[combinationKey] = {
-            timestamp: now,
-            used: true
-          };
-        }
-      });
-      setUsedCombinations(usedCombinations);
-      
-      updateFollowersUsageCounter();
-      setSuccessModal(true);
-    } catch (error) {
-      console.error('Error submitting missions:', error);
-    }
+    });
+    setUsedCombinations(usedCombinations);
+    
+    updateFollowersUsageCounter();
+    setSuccessModal(true);
   };
 
   const renderMissionButtons = (type: keyof Missions) => {
