@@ -100,6 +100,8 @@ const Manager = () => {
     account_url: '', 
     account_name: '' 
   });
+  const [editingAccount, setEditingAccount] = useState<string | null>(null);
+  const [editingAccountData, setEditingAccountData] = useState<PlatformAccount | null>(null);
   const { toast } = useToast();
 
   // Authentication
@@ -969,15 +971,35 @@ const Manager = () => {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-medium mb-2">Mission Data:</p>
-                            <div className="space-y-1">
+                            <p className="text-sm font-medium mb-2">Missions & Progress:</p>
+                            <div className="space-y-2">
                               {submission.missions_data && Object.entries(submission.missions_data).map(([type, data]: [string, any]) => (
                                 data?.selected && (
-                                  <Badge key={type} variant="secondary" className="text-xs mr-1">
-                                    {type}: {data.count}
-                                  </Badge>
+                                  <div key={type} className="bg-secondary/20 p-2 rounded-md">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="text-xs font-medium capitalize">{type}</span>
+                                      <Badge variant="outline" className="text-xs">
+                                        {data.completed || 0}/{Math.floor(data.count / 2)} tasks
+                                      </Badge>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xs text-muted-foreground">
+                                        Target: {data.count} {type}
+                                      </span>
+                                      {data.completed > 0 && (
+                                        <CheckCircle className="w-3 h-3 text-green-500" />
+                                      )}
+                                    </div>
+                                    <Progress 
+                                      value={data.completed ? (data.completed / Math.floor(data.count / 2)) * 100 : 0} 
+                                      className="h-1 mt-1"
+                                    />
+                                  </div>
                                 )
                               ))}
+                              {(!submission.missions_data || Object.keys(submission.missions_data).length === 0) && (
+                                <p className="text-xs text-muted-foreground">No missions data available</p>
+                              )}
                             </div>
                           </div>
                           <div className="flex flex-col gap-2">
@@ -1212,25 +1234,73 @@ const Manager = () => {
                           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                             <Globe className="w-6 h-6 text-white" />
                           </div>
-                          <div>
-                            <h4 className="font-semibold capitalize flex items-center gap-2">
-                              {account.platform}
-                              {account.enabled ? (
-                                <Badge variant="default" className="text-xs">Active</Badge>
-                              ) : (
-                                <Badge variant="secondary" className="text-xs">Disabled</Badge>
-                              )}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">{account.account_name}</p>
-                            <a 
-                              href={account.account_url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="text-xs text-blue-500 hover:underline"
-                            >
-                              {account.account_url}
-                            </a>
-                          </div>
+                            {editingAccount === account.id ? (
+                              <div className="space-y-2">
+                                <Input
+                                  value={editingAccountData?.account_name || ''}
+                                  onChange={(e) => setEditingAccountData({
+                                    ...editingAccountData!,
+                                    account_name: e.target.value
+                                  })}
+                                  placeholder="Account name"
+                                />
+                                <Input
+                                  value={editingAccountData?.account_url || ''}
+                                  onChange={(e) => setEditingAccountData({
+                                    ...editingAccountData!,
+                                    account_url: e.target.value
+                                  })}
+                                  placeholder="Account URL"
+                                />
+                                <div className="flex gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    onClick={async () => {
+                                      if (editingAccountData) {
+                                        await updatePlatformAccount(account.id, {
+                                          account_name: editingAccountData.account_name,
+                                          account_url: editingAccountData.account_url
+                                        });
+                                        setEditingAccount(null);
+                                        setEditingAccountData(null);
+                                      }
+                                    }}
+                                  >
+                                    <Save className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => {
+                                      setEditingAccount(null);
+                                      setEditingAccountData(null);
+                                    }}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <h4 className="font-semibold capitalize flex items-center gap-2">
+                                  {account.platform}
+                                  {account.enabled ? (
+                                    <Badge variant="default" className="text-xs">Active</Badge>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs">Disabled</Badge>
+                                  )}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">{account.account_name}</p>
+                                <a 
+                                  href={account.account_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-blue-500 hover:underline"
+                                >
+                                  {account.account_url}
+                                </a>
+                              </div>
+                            )}
                         </div>
                         <div className="flex items-center gap-4">
                           <Switch
@@ -1239,6 +1309,16 @@ const Manager = () => {
                               updatePlatformAccount(account.id, { enabled: checked })
                             }
                           />
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              setEditingAccount(account.id);
+                              setEditingAccountData({...account});
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
                           <Button 
                             variant="outline" 
                             size="sm"
